@@ -1,0 +1,39 @@
+---
+services:
+  rtorrent:
+    image: docker.io/k2patel/rtorrent:latest
+    container_name: rtorrent
+    environment:
+      - TZ=${TZ}
+    volumes:
+      - "${TORRENT_LOCATION}:/home/nfs_download:rw"
+      - "${TORRENTRC}:/root/.rtorrent.rc"
+    ports:
+      - 5001
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 5001 || exit 1"]
+      interval: 10s       # Check every 10 seconds
+      timeout: 10s         # Allow the command 5 seconds to complete
+      retries: 5          # Number of consecutive failures before marking as 'unhealthy'
+      start_period: 90s   # Give the service 30 seconds to start up before starting health checks
+
+  floodui:
+    image: docker.io/k2patel/floodui:latest
+    container_name: floodui
+    environment:
+      - TZ=${TZ}
+      - FLOOD_SECRET=${FLOOD_SECRET}
+      - RTORRENT_SOCK=${RTORRENT_SOCK}
+      - RTORRENT_SCGI_HOST=${RTORRENT_SCGI_HOST}
+      - RTORRENT_SCGI_PORT=${RTORRENT_SCGI_PORT}
+    volumes:
+      - "${TORRENT_LOCATION}:/home/nfs_download:ro"
+      - "${FLOOD_LOCATION}/v4/config:/config:rw"
+      - "${FLOOD_LOCATION}/server/db:/server/db:rw"
+    ports:
+      - 12080:3000
+    restart: unless-stopped
+    depends_on:
+      rtorrent:
+        condition: service_healthy
