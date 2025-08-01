@@ -7,6 +7,7 @@ RUN apk add --no-cache curl
 
 RUN mkdir /myconfig
 RUN mkdir /home/nfs_download
+RUN mkdir /root
 
 # Removed: COPY config/rtorrent.rc /root/.rtorrent.rc
 # This file will now be mounted as a volume during container runtime.
