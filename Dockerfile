@@ -12,7 +12,10 @@ RUN mkdir /home/nfs_download
 # This file will now be mounted as a volume during container runtime.
 # COPY config/rtorrent.rc /root/.rtorrent.rc
 
-RUN chown root:root /root/.rtorrent.rc || true # Ensure this doesn't fail if file isn't there yet
+# create file and ignore if it fails
+RUN touch /root/.rtorrent.rc || true
+# change ownership, ignore if it fails
+RUN chown root:root /root/.rtorrent.rc || true
 COPY install/rtorrent.sh /rtorrent.sh
 # COPY config/supervisord.conf /etc/supervisor/supervisord.conf
 
