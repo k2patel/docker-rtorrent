@@ -4,6 +4,8 @@ name: Build and Push Docker Image
 # This workflow is manually triggered from the "Actions" tab in GitHub.
 # It requires a single input: the version tag of the flood repository to use.
 on:
+  schedule:
+    - cron: '0 0 2 * *'  # This runs at midnight on the first day of every month
   workflow_dispatch:
 
 jobs:
